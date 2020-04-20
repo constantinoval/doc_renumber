@@ -41,7 +41,7 @@ def renumber_figures(inp, output, prefix, start):
                     figs[n] = [prefix, start]
                     start += 1
             new_str = pack_ref([figs[n][1] for n in nn], figs[n][0])
-            print(ss[9], '->', new_str)
+            print(ss[0], '->', new_str)
             replace_text_in_runs(p.runs, ss.span(9)[0],
                                  ss.span(9)[1], new_str)
             ss = fig_in_text.search(p.text, ss.span(9)[1]+1)

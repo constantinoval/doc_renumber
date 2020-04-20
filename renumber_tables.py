@@ -41,7 +41,7 @@ def renumber_tables(inp, output, prefix, start):
                     tables[n] = [prefix, start]
                     start += 1
             new_str = pack_ref([tables[n][1] for n in nn], tables[n][0])
-            print(ss[11], '->', new_str)
+            print(ss[0], '->', new_str)
             replace_text_in_runs(p.runs, ss.span(11)[0],
                                  ss.span(11)[1], new_str)
             ss = tab_in_text.search(p.text, pos=ss.span(11)[1]+1)
