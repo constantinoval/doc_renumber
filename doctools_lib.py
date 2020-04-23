@@ -57,6 +57,8 @@ def unpack_ref(s):
 def pack_ref(s, prefix=''):
     s = list(s)
     s.sort()
+    while(-1) in s:
+        s.pop(0)
     ss = [False]+[abs((s[i+1]-s[i])) > 1 for i in range(len(s)-1)]
     rez = [[]]
     for i, sss in enumerate(ss):

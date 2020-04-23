@@ -60,15 +60,19 @@ def renumber_refs(inp, output, refs_input=None, refs_output='new_refs.xlsx', sta
     for p in paragraph_iterator(doc):  # doc.paragraphs:
         for ss in t.findall(p.text):
             for sss in unpack_ref(ss)[1]:
+                if refs_input and (not (int(sss) in lit.index)):
+                    new_n[sss] = -1
+                    lit.loc[int(sss)] = 'Not found'
+                    continue
                 if not sss in new_n:
                     new_n[sss] = start
                     start += 1
 
     r = list(map(int, new_n.keys()))
     if refs_input:
-        for rr in r:
-            if not rr in lit:
-                lit.loc[rr] = str(rr)
+        # for rr in r:
+        #     if not rr in lit:
+        #         lit.loc[rr] = str(rr)
         lit = lit.loc[r]
         lit['new_n'] = list(new_n.values())
         lit = fix_dublicates(lit)
@@ -93,6 +97,7 @@ def renumber_refs(inp, output, refs_input=None, refs_output='new_refs.xlsx', sta
     doc.save(output)
     lit.drop_duplicates(subset='new_n', inplace=True)
     lit['n'] = lit['new_n']
+    lit = lit.loc[lit.title != 'Not found']
     lit.to_excel(refs_output, columns=['n', 'title'], index=False)
 
 
