@@ -5,6 +5,7 @@ import re
 import pandas as pd
 from os.path import exists
 from doctools_lib import pack_ref, unpack_ref, replace_text_in_runs, paragraph_iterator
+import numpy as np
 
 
 def fix_dublicates(data):
@@ -51,7 +52,9 @@ def renumber_refs(inp, output, refs_input=None, refs_output='new_refs.xlsx', sta
         if exists(inp[:-4]+'xlsx'):
             refs_input = inp[:-4]+'xlsx'
     if refs_input:
-        lit = pd.read_excel(refs_input, index_col=0)
+        lit = pd.read_excel(refs_input)
+        lit.n = lit.n.astype(dtype=np.dtype(int))
+        lit.set_index(keys='n', inplace=True)
     doc = docx.Document(inp)
     new_n = {}
     for p in paragraph_iterator(doc):  # doc.paragraphs:
@@ -61,8 +64,11 @@ def renumber_refs(inp, output, refs_input=None, refs_output='new_refs.xlsx', sta
                     new_n[sss] = start
                     start += 1
 
-    r = map(int, new_n.keys())
+    r = list(map(int, new_n.keys()))
     if refs_input:
+        for rr in r:
+            if not rr in lit:
+                lit.loc[rr] = str(rr)
         lit = lit.loc[r]
         lit['new_n'] = list(new_n.values())
         lit = fix_dublicates(lit)
