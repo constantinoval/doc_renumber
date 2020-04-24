@@ -90,9 +90,14 @@ def renumber_refs(inp, output, refs_input=None, refs_output='new_refs.xlsx', sta
         while ss:
             l = ss[1]
             new_text = pack_ref(lit.loc[map(int, unpack_ref(l)[1])]['new_n'])
-            print(ss[1], '->', new_text)
-            replace_text_in_runs(p.runs, ss.span(1)[0],
-                                 ss.span(1)[1], new_text)
+            if new_text == '':
+                print(ss[1], '-> removing')
+                replace_text_in_runs(p.runs, ss.start(),
+                                     ss.end(), new_text)
+            else:
+                print(ss[1], '->', new_text)
+                replace_text_in_runs(p.runs, ss.span(1)[0],
+                                     ss.span(1)[1], new_text)
             ss = t.search(p.text, pos=ss.span(1)[1]+1)
     doc.save(output)
     lit.drop_duplicates(subset='new_n', inplace=True)
