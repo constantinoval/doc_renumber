@@ -42,16 +42,21 @@ def replace_text_in_runs(runs, start, end, new_text):
 
 def unpack_ref(s):
     p = re.compile(',|;|и')
+    tir = re.compile('-|–')
     rez = []
     for ss in p.split(s):
-        if '-' in ss:
-            sss = ss.split('-')
+        sss = tir.split(ss)
+        if len(sss)>1:
             rez.extend(range(int(sss[0].split('.')[-1]),
                              int(sss[1].split('.')[-1])+1))
         else:
             rez.append(int(ss.split('.')[-1]))
-    prefix = ss.split('.')[0]
-    return prefix.strip(), rez
+    pr = sss[0]
+    prefix = ('.'.join(pr.split('.')[:-1]) if len(pr.split('.'))>=2 else '').strip()
+    nums = rez
+    full_nums = [f'{prefix}.{i}' for i in nums]
+
+    return prefix, nums, full_nums
 
 
 def pack_ref(s, prefix=''):
@@ -90,3 +95,7 @@ def paragraph_iterator(doc):
                     cell = block.cell(r, c)
                     for p in cell.paragraphs:
                         yield p
+
+if __name__=='__main__':
+    s = f"3.1.1- 3.1.5"
+    print(s, unpack_ref(s))

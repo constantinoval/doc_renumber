@@ -20,7 +20,7 @@ def get_tab_params(input_str):
 
 
 tab_in_text = re.compile(
-    r'(табл((.)|(иц((е)|(ы)|(ах)|(а)|())))\s+)(([\s,и]*[\d.-]+)*[^\D])', re.IGNORECASE)
+    r'(табл((.)|(иц((е)|(ы)|(ах)|(а)|())))\s+)(([\s,и]*[\d.\-–]+)*[^\D])', re.IGNORECASE)
 
 
 def renumber_tables(inp, output, prefix, start):
@@ -35,7 +35,7 @@ def renumber_tables(inp, output, prefix, start):
         ss = tab_in_text.search(p.text)
         while ss:
             #body = ss[1]
-            _, nn = unpack_ref(ss[11])
+            _, _, nn = unpack_ref(ss[11])
             for n in nn:
                 if not n in tables:
                     tables[n] = [prefix, start]

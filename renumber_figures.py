@@ -20,7 +20,7 @@ def get_fig_params(input_str):
 
 
 fig_in_text = re.compile(
-    r'(рис((.)|(ун((ке)|(ок)|(ках))))\s+)(([\s,и]*[\d.-]+)*[^\D])', re.IGNORECASE)
+    r'(рис((.)|(ун((ке)|(ок)|(ка)|(ках))))\s+)(([\s,и]*[\d.\-–]+)*[^\D])', re.IGNORECASE)
 
 
 def renumber_figures(inp, output, prefix, start):
@@ -35,16 +35,16 @@ def renumber_figures(inp, output, prefix, start):
         ss = fig_in_text.search(p.text)
         while ss:
             # body = ss[1]
-            _, nn = unpack_ref(ss[9])
+            _, _, nn = unpack_ref(ss[10])
             for n in nn:
                 if not n in figs:
                     figs[n] = [prefix, start]
                     start += 1
             new_str = pack_ref([figs[n][1] for n in nn], figs[n][0])
             print(ss[0], '->', new_str)
-            replace_text_in_runs(p.runs, ss.span(9)[0],
-                                 ss.span(9)[1], new_str)
-            ss = fig_in_text.search(p.text, ss.span(9)[1]+1)
+            replace_text_in_runs(p.runs, ss.span(10)[0],
+                                 ss.span(10)[1], new_str)
+            ss = fig_in_text.search(p.text, ss.span(10)[1]+1)
     doc.save(output)
 
 
