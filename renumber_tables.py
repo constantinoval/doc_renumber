@@ -22,25 +22,31 @@ def get_tab_params(input_str):
 tab_in_text = re.compile(
     r'(табл((.)|(иц((е)|(ы)|(ах)|(а)|())))\s+)(([\s,и]*[\d.\-–]+)*[^\D])', re.IGNORECASE)
 
-
-def renumber_tables(inp, output, prefix, start):
-    tables = {}
-    doc = docx.Document(inp)
-    for p in paragraph_iterator(doc):  # doc.paragraphs:
+def analize_tables(document, prefix, start):
+    pat = re.compile(
+        r'^\s*(Таб\.|Таблица|Табл.)\s+(?P<num>[\d.]+?)\s*([–-].*|[. ]*$)')
+    rez={}
+    for p in paragraph_iterator(document):
         kw = get_tab_params(p.text)
         if kw:
             start = kw['start']
             prefix = kw['prefix']
             continue
+        m = pat.match(p.text)
+        if m:
+            rez[m.group('num')] = [prefix, start]
+            start+=1
+    return rez
+
+def renumber_tables(inp, output, prefix, start):
+    tables = analize_tables(docx.Document(inp), prefix, start)
+    doc = docx.Document(inp)
+    for p in paragraph_iterator(doc):  # doc.paragraphs:
         ss = tab_in_text.search(p.text)
         while ss:
             #body = ss[1]
             _, _, nn = unpack_ref(ss[11])
-            for n in nn:
-                if not n in tables:
-                    tables[n] = [prefix, start]
-                    start += 1
-            new_str = pack_ref([tables[n][1] for n in nn], tables[n][0])
+            new_str = pack_ref([tables[n][1] for n in nn], tables[nn[0]][0])
             print(ss[0], '->', new_str)
             replace_text_in_runs(p.runs, ss.span(11)[0],
                                  ss.span(11)[1], new_str)

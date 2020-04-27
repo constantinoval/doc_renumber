@@ -53,8 +53,10 @@ def unpack_ref(s):
             rez.append(int(ss.split('.')[-1]))
     pr = sss[0]
     prefix = ('.'.join(pr.split('.')[:-1]) if len(pr.split('.'))>=2 else '').strip()
+    if prefix:
+        prefix+='.'
     nums = rez
-    full_nums = [f'{prefix}.{i}' for i in nums]
+    full_nums = [f'{prefix}{i}' for i in nums]
 
     return prefix, nums, full_nums
 

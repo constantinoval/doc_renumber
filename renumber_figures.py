@@ -22,25 +22,31 @@ def get_fig_params(input_str):
 fig_in_text = re.compile(
     r'(рис((.)|(ун((ке)|(ок)|(ка)|(ках))))\s+)(([\s,и]*[\d.\-–]+)*[^\D])', re.IGNORECASE)
 
-
-def renumber_figures(inp, output, prefix, start):
-    figs = {}
-    doc = docx.Document(inp)
-    for p in paragraph_iterator(doc):  # doc.paragraphs:
+def analize_figures(document, prefix, start):
+    pat = re.compile(
+        r'^\s*(Рис\.|Рисунок)\s+(?P<num>[\d.]+?)\s*([–-].*|[. ]*$)')
+    rez={}
+    for p in paragraph_iterator(document):
         kw = get_fig_params(p.text)
         if kw:
             start = kw['start']
             prefix = kw['prefix']
             continue
+        m = pat.match(p.text)
+        if m:
+            rez[m.group('num')] = [prefix, start]
+            start+=1
+    return rez
+
+def renumber_figures(inp, output, prefix, start):
+    figs = analize_figures(docx.Document(inp), prefix, start)
+    doc = docx.Document(inp)
+    for p in paragraph_iterator(doc):  # doc.paragraphs:
         ss = fig_in_text.search(p.text)
         while ss:
             # body = ss[1]
             _, _, nn = unpack_ref(ss[10])
-            for n in nn:
-                if not n in figs:
-                    figs[n] = [prefix, start]
-                    start += 1
-            new_str = pack_ref([figs[n][1] for n in nn], figs[n][0])
+            new_str = pack_ref([figs[n][1] for n in nn], figs[nn[0]][0])
             print(ss[0], '->', new_str)
             replace_text_in_runs(p.runs, ss.span(10)[0],
                                  ss.span(10)[1], new_str)
