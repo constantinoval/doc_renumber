@@ -8,18 +8,16 @@ formula = re.compile(r'\(([\d.]+)\)')
 
 
 def get_eq_params(input_str):
-    kw = re.compile(r'\]->(.*eq.*)<-\[')
-    s = kw.search(input_str)
-    if s:
-        s = s[1]
-        kws = {}
-        pref = re.compile(r'eq_prefix=([\d.-]+)')
-        start = re.compile(r'eq_start=([\d]+)')
-        kws['prefix'] = pref.search(s)[1] if pref.search(s) else ''
-        kws['start'] = int(start.search(s)[1]) if start.search(s) else 1
-        return kws
-    else:
+    p1 = re.compile(r'<e>(.*)<\\e>')
+    start = re.compile(r'start\s*=\s*([\d]+)')
+    prefix = re.compile(r'prefix\s*=\s*([\d.]+)')
+    m1 = p1.search(input_str)
+    if not m1:
         return None
+    kws = {}
+    kws['prefix'] = prefix.search(m1[1])[1] if prefix.search(m1[1]) else ''
+    kws['start'] = int(start.search(m1[1])[1]) if start.search(m1[1]) else 1
+    return kws
 
 def analize_formulas(document, prefix, start):
     pat = re.compile(r'[^а-яА-Я]*\((?P<num>[\d.-]+)\)\s*$')

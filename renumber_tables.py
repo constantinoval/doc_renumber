@@ -6,18 +6,16 @@ from doctools_lib import unpack_ref, pack_ref, replace_text_in_runs, paragraph_i
 
 
 def get_tab_params(input_str):
-    kw = re.compile(r'\]->(.*tab.*)<-\[')
-    s = kw.search(input_str)
-    if s:
-        s = s[1]
-        kws = {}
-        pref = re.compile(r'tab_prefix=([\d.-]+)')
-        start = re.compile(r'tab_start=([\d]+)')
-        kws['prefix'] = pref.search(s)[1] if pref.search(s) else ''
-        kws['start'] = int(start.search(s)[1]) if start.search(s) else 1
-        return kws
-    else:
+    p1 = re.compile(r'<t>(.*)<\\t>')
+    start = re.compile(r'start\s*=\s*([\d]+)')
+    prefix = re.compile(r'prefix\s*=\s*([\d.]+)')
+    m1 = p1.search(input_str)
+    if not m1:
         return None
+    kws = {}
+    kws['prefix'] = prefix.search(m1[1])[1] if prefix.search(m1[1]) else ''
+    kws['start'] = int(start.search(m1[1])[1]) if start.search(m1[1]) else 1
+    return kws
 
 
 tab_in_text = re.compile(

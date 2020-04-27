@@ -6,18 +6,16 @@ from doctools_lib import replace_text_in_runs, unpack_ref, pack_ref, paragraph_i
 
 
 def get_fig_params(input_str):
-    kw = re.compile(r'\]->(.*fig.*)<-\[')
-    s = kw.search(input_str)
-    if s:
-        s = s[1]
-        kws = {}
-        pref = re.compile(r'fig_prefix=([\d.-]+)')
-        start = re.compile(r'fig_start=([\d]+)')
-        kws['prefix'] = pref.search(s)[1] if pref.search(s) else ''
-        kws['start'] = int(start.search(s)[1]) if start.search(s) else 1
-        return kws
-    else:
+    p1 = re.compile(r'<f>(.*)<\\f>')
+    start = re.compile(r'start\s*=\s*([\d]+)')
+    prefix = re.compile(r'prefix\s*=\s*([\d.]+)')
+    m1 = p1.search(input_str)
+    if not m1:
         return None
+    kws = {}
+    kws['prefix'] = prefix.search(m1[1])[1] if prefix.search(m1[1]) else ''
+    kws['start'] = int(start.search(m1[1])[1]) if start.search(m1[1]) else 1
+    return kws
 
 
 fig_in_text = re.compile(
