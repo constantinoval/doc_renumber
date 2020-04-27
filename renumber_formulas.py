@@ -1,4 +1,5 @@
 # %%
+from colorama import Fore, Back, init
 import docx
 import re
 from doctools_lib import replace_text_in_runs, paragraph_iterator
@@ -20,26 +21,37 @@ def get_eq_params(input_str):
     else:
         return None
 
-
-def renumber_formulas(inp, output, prefix, start):
-    formulas = {}
-    doc = docx.Document(inp)
-    for p in paragraph_iterator(doc):  # doc.paragraphs:
+def analize_formulas(document, prefix, start):
+    pat = re.compile(r'[^а-яА-Я]*\((?P<num>[\d.-]+)\)\s*$')
+    rez={}
+    for p in paragraph_iterator(document):
         kw = get_eq_params(p.text)
         if kw:
             start = kw['start']
             prefix = kw['prefix']
             continue
+        m = pat.match(p.text)
+        if m:
+            rez[m.group('num')] = [prefix, start]
+            start+=1
+    return rez
+
+
+def renumber_formulas(inp, output, prefix, start):
+    init(autoreset=True)
+    formulas = analize_formulas(docx.Document(inp), prefix, start)
+    doc = docx.Document(inp)
+    for p in paragraph_iterator(doc):  # doc.paragraphs:
         ss = formula.search(p.text)
         while ss:
-            n = ss[0]
+            n = ss[1]
             if not n in formulas:
-                formulas[n] = [prefix, start]
-                start += 1
-            new_str = f'{formulas[n][0]}{formulas[n][1]}'
-            print(ss[1], '->', new_str)
-            replace_text_in_runs(p.runs, ss.span(1)[0],
-                                 ss.span(1)[1], new_str)
+                print(Fore.RED+f'Equation reference {n} is not found in document')
+            else:
+                new_str = f'{formulas[n][0]}{formulas[n][1]}'
+                print(ss[1], '->', new_str)
+                replace_text_in_runs(p.runs, ss.span(1)[0],
+                                    ss.span(1)[1], new_str)
             ss = formula.search(p.text, pos=ss.span(1)[1]+1)
     doc.save(output)
 

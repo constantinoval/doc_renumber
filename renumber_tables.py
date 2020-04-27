@@ -1,4 +1,5 @@
 # %%
+from colorama import Fore, Back, init
 import docx
 import re
 from doctools_lib import unpack_ref, pack_ref, replace_text_in_runs, paragraph_iterator
@@ -39,6 +40,7 @@ def analize_tables(document, prefix, start):
     return rez
 
 def renumber_tables(inp, output, prefix, start):
+    init(autoreset=True)
     tables = analize_tables(docx.Document(inp), prefix, start)
     doc = docx.Document(inp)
     for p in paragraph_iterator(doc):  # doc.paragraphs:
@@ -46,10 +48,15 @@ def renumber_tables(inp, output, prefix, start):
         while ss:
             #body = ss[1]
             _, _, nn = unpack_ref(ss[11])
-            new_str = pack_ref([tables[n][1] for n in nn], tables[nn[0]][0])
-            print(ss[0], '->', new_str)
-            replace_text_in_runs(p.runs, ss.span(11)[0],
-                                 ss.span(11)[1], new_str)
+            for n in nn:
+                if not n in tables:
+                    print(Fore.RED+f'Table {n} is not found in document')
+                    nn.remove(n)
+            if nn:
+                new_str = pack_ref([tables[n][1] for n in nn], tables[nn[0]][0])
+                print(ss[0], '->', new_str)
+                replace_text_in_runs(p.runs, ss.span(11)[0],
+                                    ss.span(11)[1], new_str)
             ss = tab_in_text.search(p.text, pos=ss.span(11)[1]+1)
     doc.save(output)
 

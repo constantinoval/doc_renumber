@@ -1,4 +1,5 @@
 # %%
+from colorama import Fore, Back, init
 import docx
 import re
 from doctools_lib import replace_text_in_runs, unpack_ref, pack_ref, paragraph_iterator
@@ -39,6 +40,7 @@ def analize_figures(document, prefix, start):
     return rez
 
 def renumber_figures(inp, output, prefix, start):
+    init(autoreset=True)
     figs = analize_figures(docx.Document(inp), prefix, start)
     doc = docx.Document(inp)
     for p in paragraph_iterator(doc):  # doc.paragraphs:
@@ -46,10 +48,15 @@ def renumber_figures(inp, output, prefix, start):
         while ss:
             # body = ss[1]
             _, _, nn = unpack_ref(ss[10])
-            new_str = pack_ref([figs[n][1] for n in nn], figs[nn[0]][0])
-            print(ss[0], '->', new_str)
-            replace_text_in_runs(p.runs, ss.span(10)[0],
-                                 ss.span(10)[1], new_str)
+            for n in nn:
+                if not n in figs:
+                    print(Fore.RED+f'Figure {n} is not found in document')
+                    nn.remove(n)
+            if nn:
+                new_str = pack_ref([figs[n][1] for n in nn], figs[nn[0]][0])
+                print(ss[0], '->', new_str)
+                replace_text_in_runs(p.runs, ss.span(10)[0],
+                                    ss.span(10)[1], new_str)
             ss = fig_in_text.search(p.text, ss.span(10)[1]+1)
     doc.save(output)
 
