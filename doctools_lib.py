@@ -46,15 +46,16 @@ def unpack_ref(s):
     rez = []
     for ss in p.split(s):
         sss = tir.split(ss)
-        if len(sss)>1:
+        if len(sss) > 1:
             rez.extend(range(int(sss[0].split('.')[-1]),
                              int(sss[1].split('.')[-1])+1))
         else:
             rez.append(int(ss.split('.')[-1]))
     pr = sss[0]
-    prefix = ('.'.join(pr.split('.')[:-1]) if len(pr.split('.'))>=2 else '').strip()
+    prefix = ('.'.join(pr.split('.')[:-1])
+              if len(pr.split('.')) >= 2 else '').strip()
     if prefix:
-        prefix+='.'
+        prefix += '.'
     nums = rez
     full_nums = [f'{prefix}{i}' for i in nums]
 
@@ -94,10 +95,14 @@ def paragraph_iterator(doc):
             nrows = len(block.rows)
             for r in range(nrows):
                 for c in range(ncols):
-                    cell = block.cell(r, c)
-                    for p in cell.paragraphs:
-                        yield p
+                    try:
+                        cell = block.cell(r, c)
+                        for p in cell.paragraphs:
+                            yield p
+                    except:
+                        pass
 
-if __name__=='__main__':
+
+if __name__ == '__main__':
     s = f"3.1.1- 3.1.5"
     print(s, unpack_ref(s))

@@ -4,6 +4,8 @@ import docx
 import re
 from doctools_lib import replace_text_in_runs, unpack_ref, pack_ref, paragraph_iterator
 
+stop = re.compile(r'<stop><\\stop>')
+
 
 def get_fig_params(input_str):
     p1 = re.compile(r'<f>(.*)<\\f>')
@@ -21,11 +23,14 @@ def get_fig_params(input_str):
 fig_in_text = re.compile(
     r'(рис((.)|(ун((ке)|(ок)|(ка)|(ках))))\s+)(([\s,и]*[\d.\-–]+)*[^\D])', re.IGNORECASE)
 
+
 def analize_figures(document, prefix, start):
     pat = re.compile(
         r'^\s*(Рис\.|Рисунок)\s+(?P<num>[\d.]+?)\s*([–-].*|[. ]*$)')
-    rez={}
+    rez = {}
     for p in paragraph_iterator(document):
+        if stop.search(p.text):
+            return rez
         kw = get_fig_params(p.text)
         if kw:
             start = kw['start']
@@ -34,14 +39,17 @@ def analize_figures(document, prefix, start):
         m = pat.match(p.text)
         if m:
             rez[m.group('num')] = [prefix, start]
-            start+=1
+            start += 1
     return rez
+
 
 def renumber_figures(inp, output, prefix, start):
     init(autoreset=True)
     figs = analize_figures(docx.Document(inp), prefix, start)
     doc = docx.Document(inp)
     for p in paragraph_iterator(doc):  # doc.paragraphs:
+        if stop.search(p.text):
+            break
         ss = fig_in_text.search(p.text)
         while ss:
             # body = ss[1]
@@ -54,7 +62,7 @@ def renumber_figures(inp, output, prefix, start):
                 new_str = pack_ref([figs[n][1] for n in nn], figs[nn[0]][0])
                 print(ss[0], '->', new_str)
                 replace_text_in_runs(p.runs, ss.span(10)[0],
-                                    ss.span(10)[1], new_str)
+                                     ss.span(10)[1], new_str)
             ss = fig_in_text.search(p.text, ss.span(10)[1]+1)
     doc.save(output)
 

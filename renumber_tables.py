@@ -4,6 +4,8 @@ import docx
 import re
 from doctools_lib import unpack_ref, pack_ref, replace_text_in_runs, paragraph_iterator
 
+stop = re.compile(r'<stop><\\stop>')
+
 
 def get_tab_params(input_str):
     p1 = re.compile(r'<t>(.*)<\\t>')
@@ -21,11 +23,14 @@ def get_tab_params(input_str):
 tab_in_text = re.compile(
     r'(табл((.)|(иц((е)|(ы)|(ах)|(а)|())))\s+)(([\s,и]*[\d.\-–]+)*[^\D])', re.IGNORECASE)
 
+
 def analize_tables(document, prefix, start):
     pat = re.compile(
         r'^\s*(Таб\.|Таблица|Табл.)\s+(?P<num>[\d.]+?)\s*([–-].*|[. ]*$)')
-    rez={}
+    rez = {}
     for p in paragraph_iterator(document):
+        if stop.search(p.text):
+            return rez
         kw = get_tab_params(p.text)
         if kw:
             start = kw['start']
@@ -34,14 +39,17 @@ def analize_tables(document, prefix, start):
         m = pat.match(p.text)
         if m:
             rez[m.group('num')] = [prefix, start]
-            start+=1
+            start += 1
     return rez
+
 
 def renumber_tables(inp, output, prefix, start):
     init(autoreset=True)
     tables = analize_tables(docx.Document(inp), prefix, start)
     doc = docx.Document(inp)
     for p in paragraph_iterator(doc):  # doc.paragraphs:
+        if stop.search(p.text):
+            break
         ss = tab_in_text.search(p.text)
         while ss:
             #body = ss[1]
@@ -51,10 +59,11 @@ def renumber_tables(inp, output, prefix, start):
                     print(Fore.RED+f'Table {n} is not found in document')
                     nn.remove(n)
             if nn:
-                new_str = pack_ref([tables[n][1] for n in nn], tables[nn[0]][0])
+                new_str = pack_ref([tables[n][1]
+                                    for n in nn], tables[nn[0]][0])
                 print(ss[0], '->', new_str)
                 replace_text_in_runs(p.runs, ss.span(11)[0],
-                                    ss.span(11)[1], new_str)
+                                     ss.span(11)[1], new_str)
             ss = tab_in_text.search(p.text, pos=ss.span(11)[1]+1)
     doc.save(output)
 

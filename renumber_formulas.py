@@ -19,10 +19,16 @@ def get_eq_params(input_str):
     kws['start'] = int(start.search(m1[1])[1]) if start.search(m1[1]) else 1
     return kws
 
+
+stop = re.compile(r'<stop><\\stop>')
+
+
 def analize_formulas(document, prefix, start):
     pat = re.compile(r'[^а-яА-Я]*\((?P<num>[\d.-]+)\)\s*$')
-    rez={}
+    rez = {}
     for p in paragraph_iterator(document):
+        if stop.search(p.text):
+            return rez
         kw = get_eq_params(p.text)
         if kw:
             start = kw['start']
@@ -30,8 +36,10 @@ def analize_formulas(document, prefix, start):
             continue
         m = pat.match(p.text)
         if m:
-            rez[m.group('num')] = [prefix, start]
-            start+=1
+            n = m.group('num')
+            if not n in rez:
+                rez[n] = [prefix, start]
+                start += 1
     return rez
 
 
@@ -40,16 +48,19 @@ def renumber_formulas(inp, output, prefix, start):
     formulas = analize_formulas(docx.Document(inp), prefix, start)
     doc = docx.Document(inp)
     for p in paragraph_iterator(doc):  # doc.paragraphs:
+        if stop.search(p.text):
+            break
         ss = formula.search(p.text)
         while ss:
             n = ss[1]
-            if not n in formulas:
-                print(Fore.RED+f'Equation reference {n} is not found in document')
+            if not (n in formulas):
+                print(
+                    Fore.RED+f'Equation reference {n} is not found in document')
             else:
                 new_str = f'{formulas[n][0]}{formulas[n][1]}'
                 print(ss[1], '->', new_str)
                 replace_text_in_runs(p.runs, ss.span(1)[0],
-                                    ss.span(1)[1], new_str)
+                                     ss.span(1)[1], new_str)
             ss = formula.search(p.text, pos=ss.span(1)[1]+1)
     doc.save(output)
 

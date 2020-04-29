@@ -10,7 +10,9 @@
             "request": "launch",
             "program": "${file}",
             "console": "integratedTerminal",
-            "args": ["2.1.1.docx"]
+            "args": [
+                "D:/oneDrive/work/current/SAROV2020/Отчеты по удаленной работе/Отчет - апрель/Композиты_АПРЕЛЬ 2020.docx"
+            ]
         }
     ]
 }
