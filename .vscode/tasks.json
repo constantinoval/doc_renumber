@@ -6,10 +6,7 @@
         {
             "label": "zip & copy",
             "type": "shell",
-            "command": [
-                "cd ../",
-                "dir"
-            ]
+            "command": "zip_and_copy.bat"
         }
     ]
 }

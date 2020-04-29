@@ -1,0 +1,4 @@
+*.docx
+*.xlsx
+.vscode
+__pycache__
