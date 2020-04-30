@@ -61,7 +61,7 @@ def renumber_refs(inp, output, refs_input=None, refs_output='new_refs.xlsx', sta
         for ss in t.findall(p.text):
             for sss in unpack_ref(ss)[1]:
                 if refs_input and (not (int(sss) in lit.index)):
-                    new_n[sss] = -1
+                    new_n[sss] = 0
                     lit.loc[int(sss)] = 'Not found'
                     continue
                 if not sss in new_n:
