@@ -20,8 +20,8 @@ def get_fig_params(input_str):
 
 fig_in_text = re.compile(
     r'(рис((.)|(ун((ке)|(ок)|(ка)|(ках))))\s+)(([\s,и]*[\d.\-–]+)*[^\D])', re.IGNORECASE)
-stop_tag = re.compile(r'<fstop>')
-continue_tag = re.compile(r'<fcontinue>')
+stop_tag = re.compile(r'<f+stop>')
+continue_tag = re.compile(r'<f+continue>')
 
 
 def analize_figures(document, prefix='', start=1):

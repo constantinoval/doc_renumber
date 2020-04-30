@@ -5,8 +5,8 @@ import re
 from doctools_lib import replace_text_in_runs, paragraph_iterator
 
 formula = re.compile(r'\(([\d.]+)\)')
-stop_tag = re.compile(r'<estop>')
-continue_tag = re.compile(r'<econtinue>')
+stop_tag = re.compile(r'<e+stop>')
+continue_tag = re.compile(r'<e+continue>')
 
 
 def get_eq_params(input_str):

@@ -45,8 +45,8 @@ def fix_dublicates(data):
 
 
 t = re.compile(r'\[([0123456789\-–,;\s]*)\]')
-stop_tag = re.compile(r'<rstop>')
-continue_tag = re.compile(r'<rcontinue>')
+stop_tag = re.compile(r'<r+stop>')
+continue_tag = re.compile(r'<r+continue>')
 
 
 def renumber_refs(inp, output, refs_input=None, refs_output='new_refs.xlsx', start=1):
