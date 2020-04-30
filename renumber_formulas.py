@@ -22,7 +22,7 @@ def get_eq_params(input_str):
     return kws
 
 
-def analize_formulas(document, prefix, start):
+def analize_formulas(document, prefix='', start=1):
     pat = re.compile(r'[^а-яА-Я]*\((?P<num>[\d.-]+)\)\s*$')
     rez = {}
     do_analysis = True

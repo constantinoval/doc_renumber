@@ -24,7 +24,7 @@ stop_tag = re.compile(r'<tstop>')
 continue_tag = re.compile(r'<tcontinue>')
 
 
-def analize_tables(document, prefix, start):
+def analize_tables(document, prefix='', start=1):
     pat = re.compile(
         r'^\s*(Таб\.|Таблица|Табл.)\s+(?P<num>[\d.]+?)\s*([–-].*|[. ]*$)')
     rez = {}

@@ -24,7 +24,7 @@ stop_tag = re.compile(r'<fstop>')
 continue_tag = re.compile(r'<fcontinue>')
 
 
-def analize_figures(document, prefix, start):
+def analize_figures(document, prefix='', start=1):
     pat = re.compile(
         r'^\s*(Рис\.|Рисунок)\s+(?P<num>[\d.]+?)\s*([–-].*|[. ]*$)')
     rez = {}

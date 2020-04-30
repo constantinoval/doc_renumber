@@ -13,7 +13,7 @@ Usage example: python doc_renumber test.docx -m fe --output test.docx
 """)
     parser.add_argument('input', help='Input docx file')
     parser.add_argument('--mode', '-m', default='eft',
-                        help='Items to renumber. e - equations, f - figures, t - tables, r - references.\n For example: fr - figures and references')
+                        help='Items to renumber. e - equations, f - figures, t - tables, r - references, s - show statistics.\n For example: fr - figures and references')
     parser.add_argument('--start', '-n', default=1,
                         help='Start number of new numbering', type=int)
     parser.add_argument('--prefix', '-p', default='',
@@ -46,4 +46,6 @@ Usage example: python doc_renumber test.docx -m fe --output test.docx
         print(Fore.GREEN+'*** Renumbering formulas ***')
         renumber_formulas(inp, args.output, args.prefix, args.start)
         inp = args.output
-
+    if 'S' in args.mode.upper():
+        from doc_statistics import doc_analysis
+        doc_analysis(args.input)
