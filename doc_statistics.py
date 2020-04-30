@@ -74,7 +74,7 @@ def get_lines(doc):
 def doc_analysis(doc):
     init(autoreset=True)
     print(Fore.BLACK+Back.WHITE+'Reading text...')
-    lines = get_lines(d)
+    lines = get_lines(doc)
     print(Fore.BLACK+Back.WHITE+'Done...')
     f = analize_figures(lines)
     print(Fore.GREEN + 'Figures:', len(f))
@@ -86,9 +86,12 @@ def doc_analysis(doc):
     print(Fore.GREEN + 'Tables:', len(t))
     pprint(t, indent=5, width=40, compact=True)
 
-    print(Back.YELLOW+Fore.BLACK + 'Figures:'+Fore.WHITE+'\t'+str(len(f)))
-    print(Back.YELLOW+Fore.BLACK + 'Equations:'+Fore.WHITE+'\t'+str(len(e)))
-    print(Back.YELLOW+Fore.BLACK + 'Tables:'+Fore.WHITE+'\t'+str(len(t)))
+    print(Back.YELLOW+Fore.BLACK + 'Figures:' +
+          Fore.WHITE+Back.BLACK+'\t'+str(len(f)))
+    print(Back.YELLOW+Fore.BLACK + 'Equations:' +
+          Fore.WHITE+Back.BLACK+'\t'+str(len(e)))
+    print(Back.YELLOW+Fore.BLACK + 'Tables:' +
+          Fore.WHITE+Back.BLACK+'\t'+str(len(t)))
 
 
 if __name__ == '__main__':
