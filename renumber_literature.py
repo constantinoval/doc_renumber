@@ -85,7 +85,16 @@ def renumber_refs(inp, output, refs_input=None, refs_output='new_refs.xlsx', sta
     print(lit)
 
     doc = docx.Document(inp)
+    stop_tag = re.compile(r'<rstop>')
+    continue_tag = re.compile(r'<rcontinue>')
+    do_replacement = True
     for p in paragraph_iterator(doc):  # doc.paragraphs:
+        if stop_tag.search(p.text):
+            do_replacement = False
+        if continue_tag.search(p.text):
+            do_replacement = True
+        if not do_replacement:
+            continue
         ss = t.search(p.text)
         while ss:
             l = ss[1]

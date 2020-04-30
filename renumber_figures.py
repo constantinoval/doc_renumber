@@ -4,8 +4,6 @@ import docx
 import re
 from doctools_lib import replace_text_in_runs, unpack_ref, pack_ref, paragraph_iterator
 
-stop = re.compile(r'<stop><\\stop>')
-
 
 def get_fig_params(input_str):
     p1 = re.compile(r'<f>(.*)<\\f>')
@@ -44,12 +42,19 @@ def analize_figures(document, prefix, start):
 
 
 def renumber_figures(inp, output, prefix, start):
+    stop_tag = re.compile(r'<fstop>')
+    continue_tag = re.compile(r'<fcontinue>')
     init(autoreset=True)
     figs = analize_figures(docx.Document(inp), prefix, start)
     doc = docx.Document(inp)
+    do_replacement = True
     for p in paragraph_iterator(doc):  # doc.paragraphs:
-        if stop.search(p.text):
-            break
+        if stop_tag.search(p.text):
+            do_replacement = False
+        if continue_tag.search(p.text):
+            do_replacement = True
+        if not do_replacement:
+            continue
         ss = fig_in_text.search(p.text)
         while ss:
             # body = ss[1]

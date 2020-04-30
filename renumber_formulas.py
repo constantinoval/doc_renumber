@@ -20,14 +20,12 @@ def get_eq_params(input_str):
     return kws
 
 
-stop = re.compile(r'<stop><\\stop>')
-
 
 def analize_formulas(document, prefix, start):
     pat = re.compile(r'[^а-яА-Я]*\((?P<num>[\d.-]+)\)\s*$')
     rez = {}
     for p in paragraph_iterator(document):
-        if stop.search(p.text):
+        if stop_tag.search(p.text):
             return rez
         kw = get_eq_params(p.text)
         if kw:
@@ -44,12 +42,19 @@ def analize_formulas(document, prefix, start):
 
 
 def renumber_formulas(inp, output, prefix, start):
+    stop_tag = re.compile(r'<estop>')
+    continue_tag = re.compile(r'<econtinue>')
     init(autoreset=True)
     formulas = analize_formulas(docx.Document(inp), prefix, start)
     doc = docx.Document(inp)
+    do_replacement = True
     for p in paragraph_iterator(doc):  # doc.paragraphs:
-        if stop.search(p.text):
-            break
+        if stop_tag.search(p.text):
+            do_replacement = False
+        if continue_tag.search(p.text):
+            do_replacement = True
+        if not do_replacement:
+            continue
         ss = formula.search(p.text)
         while ss:
             n = ss[1]

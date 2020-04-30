@@ -4,8 +4,6 @@ import docx
 import re
 from doctools_lib import unpack_ref, pack_ref, replace_text_in_runs, paragraph_iterator
 
-stop = re.compile(r'<stop><\\stop>')
-
 
 def get_tab_params(input_str):
     p1 = re.compile(r'<t>(.*)<\\t>')
@@ -44,12 +42,19 @@ def analize_tables(document, prefix, start):
 
 
 def renumber_tables(inp, output, prefix, start):
+    stop_tag = re.compile(r'<tstop>')
+    continue_tag = re.compile(r'<tcontinue>')
     init(autoreset=True)
     tables = analize_tables(docx.Document(inp), prefix, start)
     doc = docx.Document(inp)
+    do_replacement = True
     for p in paragraph_iterator(doc):  # doc.paragraphs:
-        if stop.search(p.text):
-            break
+        if stop_tag.search(p.text):
+            do_replacement = False
+        if continue_tag.search(p.text):
+            do_replacement = True
+        if not do_replacement:
+            continue
         ss = tab_in_text.search(p.text)
         while ss:
             #body = ss[1]
