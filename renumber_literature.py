@@ -45,6 +45,8 @@ def fix_dublicates(data):
 
 
 t = re.compile(r'\[([0123456789\-–,;\s]*)\]')
+stop_tag = re.compile(r'<rstop>')
+continue_tag = re.compile(r'<rcontinue>')
 
 
 def renumber_refs(inp, output, refs_input=None, refs_output='new_refs.xlsx', start=1):
@@ -57,7 +59,14 @@ def renumber_refs(inp, output, refs_input=None, refs_output='new_refs.xlsx', sta
         lit.set_index(keys='n', inplace=True)
     doc = docx.Document(inp)
     new_n = {}
+    do_analysis = True
     for p in paragraph_iterator(doc):  # doc.paragraphs:
+        if stop_tag.search(p.text):
+            do_analysis = False
+        if continue_tag.search(p.text):
+            do_analysis = True
+        if not do_analysis:
+            continue
         for ss in t.findall(p.text):
             for sss in unpack_ref(ss)[1]:
                 if refs_input and (not (int(sss) in lit.index)):
@@ -85,8 +94,6 @@ def renumber_refs(inp, output, refs_input=None, refs_output='new_refs.xlsx', sta
     print(lit)
 
     doc = docx.Document(inp)
-    stop_tag = re.compile(r'<rstop>')
-    continue_tag = re.compile(r'<rcontinue>')
     do_replacement = True
     for p in paragraph_iterator(doc):  # doc.paragraphs:
         if stop_tag.search(p.text):

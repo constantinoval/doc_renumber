@@ -20,15 +20,22 @@ def get_tab_params(input_str):
 
 tab_in_text = re.compile(
     r'(табл((.)|(иц((е)|(ы)|(ах)|(а)|())))\s+)(([\s,и]*[\d.\-–]+)*[^\D])', re.IGNORECASE)
+stop_tag = re.compile(r'<tstop>')
+continue_tag = re.compile(r'<tcontinue>')
 
 
 def analize_tables(document, prefix, start):
     pat = re.compile(
         r'^\s*(Таб\.|Таблица|Табл.)\s+(?P<num>[\d.]+?)\s*([–-].*|[. ]*$)')
     rez = {}
+    do_analysis = True
     for p in paragraph_iterator(document):
-        if stop.search(p.text):
-            return rez
+        if stop_tag.search(p.text):
+            do_analysis = False
+        if continue_tag.search(p.text):
+            do_analysis = True
+        if not do_analysis:
+            continue
         kw = get_tab_params(p.text)
         if kw:
             start = kw['start']
@@ -42,8 +49,6 @@ def analize_tables(document, prefix, start):
 
 
 def renumber_tables(inp, output, prefix, start):
-    stop_tag = re.compile(r'<tstop>')
-    continue_tag = re.compile(r'<tcontinue>')
     init(autoreset=True)
     tables = analize_tables(docx.Document(inp), prefix, start)
     doc = docx.Document(inp)
