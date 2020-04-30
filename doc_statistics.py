@@ -74,7 +74,7 @@ def get_lines(doc):
 def doc_analysis(doc):
     init(autoreset=True)
     print(Fore.BLACK+Back.WHITE+'Reading text...')
-    lines = get_lines(doc)
+    lines = get_lines(Document(doc))
     print(Fore.BLACK+Back.WHITE+'Done...')
     f = analize_figures(lines)
     print(Fore.GREEN + 'Figures:', len(f))
@@ -95,5 +95,4 @@ def doc_analysis(doc):
 
 
 if __name__ == '__main__':
-    d = Document(r"D:\oneDrive\work\НИИМ\НИАГАРА\Отчет по 218\all\2.docx")
-    doc_analysis(d)
+    doc_analysis(r"D:\oneDrive\work\НИИМ\НИАГАРА\Отчет по 218\all\2.docx")
