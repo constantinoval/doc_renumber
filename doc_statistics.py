@@ -95,4 +95,11 @@ def doc_analysis(doc):
 
 
 if __name__ == '__main__':
-    doc_analysis(r"D:\oneDrive\work\НИИМ\НИАГАРА\Отчет по 218\all\2.docx")
+    from argparse import ArgumentParser
+    parser = ArgumentParser(description="""
+Usage example: python doc_statistics.py test.docx
+Gets number of figures, equations and tables from docx-file.
+""")
+    parser.add_argument('input', help='Input docx file')
+    args = parser.parse_args()
+    doc_analysis(args.input)

@@ -90,16 +90,10 @@ def paragraph_iterator(doc):
         if isinstance(block, docx.text.paragraph.Paragraph):
             yield block
         if isinstance(block, docx.table.Table):
-            ncols = len(block.columns)
-            nrows = len(block.rows)
-            for r in range(nrows):
-                for c in range(ncols):
-                    try:
-                        cell = block.cell(r, c)
-                        for p in cell.paragraphs:
-                            yield p
-                    except:
-                        pass
+            for row in block.rows:
+                for cell in row.cells:
+                    for paragraph in cell.paragraphs:
+                        yield paragraph
 
 
 if __name__ == '__main__':

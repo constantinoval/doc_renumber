@@ -4,8 +4,11 @@ if __name__ == '__main__':
     from argparse import ArgumentParser
     parser = ArgumentParser(description="""Script to renumber formulas, figures, tables and references in docx files.
 You can use special symbols in text to add prefixes and start numbers for formalas, figures and tables
-at specific place of word files. It is ]-> <-[ set.
-For example: ]-> fig_prefix=2.1. fig_stat=5 eq_prefix=1. tab_start=1 <-[
+at specific place of word files. It is <e><\e> for equations, <f><\f> - for figures, <><\t> - for tables.
+Tags <estop>, <tstop> and <fstop> - stops analysis and renumbering of equations, tables and figures.
+Tags <econtinue>, <tcontinue>, <fcontinue> - continues analysis and renumbering of equations, tables and figures.
+Tags <stop> and <continue> - stops and continues e,f, and t.
+For example: <e>prefix=2.1. start=5<\e> - for equations.
 
 Usage example: python doc_renumber test.docx -m fe --output test.docx
                python doc_renumber test.docx
