@@ -20,8 +20,8 @@ def get_tab_params(input_str):
 
 tab_in_text = re.compile(
     r'(табл((.)|(иц((е)|(ы)|(ах)|(а)|())))\s+)(([\s,и]*[\d.\-–]+)*[^\D])', re.IGNORECASE)
-stop_tag = re.compile(r'<t+stop>')
-continue_tag = re.compile(r'<t+continue>')
+stop_tag = re.compile(r'<t?stop>')
+continue_tag = re.compile(r'<t?continue>')
 
 
 def analize_tables(document, prefix='', start=1):
