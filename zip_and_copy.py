@@ -12,6 +12,7 @@ for f in ['doctools_lib.py',
           'renumber_literature.py',
           'renumber_tables.py',
           'doc_statistics.py',
+          'object_renumberers.py',
           '__main__.py'
           ]:
     z.write(f, f)

@@ -1,8 +1,9 @@
 # %%
-from colorama import Fore, Back, init
+from colorama import Fore, init
 import docx
 import re
-from doctools_lib import replace_text_in_runs, unpack_ref, pack_ref, paragraph_iterator
+from doctools_lib import replace_text_in_runs, \
+    unpack_ref, pack_ref, paragraph_iterator
 
 
 def get_fig_params(input_str):
